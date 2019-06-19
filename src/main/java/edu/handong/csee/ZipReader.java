@@ -24,12 +24,6 @@ public class ZipReader {
 	
 	String inPath;
 	String outPath; 
-	boolean analysis;
-	boolean analysis1;
-	boolean analysis2;
-	String coursecode;
-	String startYear;
-	String endYear;
 	boolean help;
 	
 	public static void main(String[] args) {
@@ -38,8 +32,7 @@ public class ZipReader {
 	}
 
 	private void run(String[] args) {
-		//String path = args[0];
-		
+		//String path = args[0];		
 		Options options = createOptions();
 		
 		if(parseOptions(options, args)){
