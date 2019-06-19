@@ -8,14 +8,29 @@ import java.util.Enumeration;
 import org.apache.commons.cli.Options;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option; 
+import org.apache.commons.cli.Options;
 
 import edu.handong.csee.Utils;
 
 public class ZipReader {
 	//ArrayList<String> contents = new ArrayList<String>();
 	Object[][] contents;
-	String outPath;
 	Object[][] datatypes;
+	
+	String inPath;
+	String outPath; 
+	boolean analysis;
+	boolean analysis1;
+	boolean analysis2;
+	String coursecode;
+	String startYear;
+	String endYear;
+	boolean help;
 	
 	public static void main(String[] args) {
 		ZipReader zipReader = new ZipReader();
@@ -25,12 +40,62 @@ public class ZipReader {
 	private void run(String[] args) {
 		//String path = args[0];
 		
-		//Options options = createOptions();
+		Options options = createOptions();
 		
-		readFileInZip("0001.zip");
-		outPath = args[1];
+		if(parseOptions(options, args)){
+			if (help){
+				printHelp(options);
+				return;
+			}
+		}
+		readFileInZip(inPath);
 		Utils.writeAFile(datatypes, outPath);
 	} 
+
+	private boolean parseOptions(Options options, String[] args) {
+		CommandLineParser parser = new DefaultParser();
+
+		try {
+
+			CommandLine cmd = parser.parse(options, args);
+
+			inPath = cmd.getOptionValue("i");
+			outPath = cmd.getOptionValue("o");			
+			help = cmd.hasOption("h");
+		
+		} catch (Exception e) {
+			printHelp(options);			
+			return false;
+		}
+		return true;
+	}
+	
+	private Options createOptions() {
+		Options options = new Options();
+		
+		options.addOption(Option.builder("i").longOpt("input")
+				.desc("Set an input file path")
+				.hasArg()
+				.argName("Input path")
+				.required()
+				.build());
+		
+		options.addOption(Option.builder("o").longOpt("output")
+				.desc("Set an output file path")
+				.hasArg()
+				.argName("Output path")
+				.required()
+				.build());
+		
+		options.addOption(Option.builder("h").longOpt("help")
+				.desc("Show a Help page")
+				//.hasArg()
+				.argName("Help")
+				//.required()
+				.build());
+		
+		return options;
+	}
 
 	public void readFileInZip(String path) {
 		ZipFile zipFile;
@@ -78,6 +143,13 @@ public class ZipReader {
 	        System.arraycopy(original[i], 0, result[i], 0, original[i].length);
 	    }
 	    return result;
+	}
+	private void printHelp(Options options) {
+		// automatically generate the help statement
+		HelpFormatter formatter = new HelpFormatter();
+		String header = "HGU Course Analyzer";
+		String footer ="";
+		formatter.printHelp("HGUCourseCounter", header, options, footer, true);
 	}
 	
 }
